@@ -63,16 +63,16 @@ class Bloco:
 
     def atualizar_blocos_adjacentes(self, grade):
         self.blocos_adjacentes = []
-        if self.linha < self.total_linhas - 1 and not grade[self.linha - 1][self.coluna].is_barreira():
+        if self.linha < self.total_linhas - 1:
             self.blocos_adjacentes.append(grade[self.linha - 1][self.coluna])
 
-        if self.linha < self.total_linhas - 1 and not grade[self.linha + 1][self.coluna].is_barreira():
+        if self.linha < self.total_linhas - 1:
             self.blocos_adjacentes.append(grade[self.linha + 1][self.coluna])
 
-        if self.coluna > 0 and not grade[self.linha][self.coluna - 1].is_barreira():
+        if self.coluna > 0:
             self.blocos_adjacentes.append(grade[self.linha][self.coluna - 1])
 
-        if self.coluna < self.total_linhas - 1 and not grade[self.linha][self.coluna + 1].is_barreira():
+        if self.coluna < self.total_linhas - 1:
             self.blocos_adjacentes.append(grade[self.linha][self.coluna + 1])
 
     def __lt__(self, other):

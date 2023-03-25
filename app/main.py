@@ -18,7 +18,7 @@ def criar_grade(linhas, largura):
 
 
 def main(janela, largura):
-    LINHAS = 50
+    LINHAS = 42
     grade = criar_grade(LINHAS, largura)
 
     bloco_inicial = bloco_final = None
