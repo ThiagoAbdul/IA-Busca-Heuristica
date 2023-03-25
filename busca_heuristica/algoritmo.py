@@ -43,7 +43,7 @@ def a_estrela(desenhar, grade, bloco_inicial: Bloco, bloco_final: Bloco):
 
         for bloco_adjacente in bloco_atual.blocos_adjacentes:
             # MODIFY
-            custo_percorrido_temp = custos_percorridos[bloco_atual] + 1 if bloco_adjacente.cor == cores.BRANCO else 60
+            custo_percorrido_temp = custos_percorridos[bloco_atual] + bloco_adjacente.custo
 
             if custo_percorrido_temp < custos_percorridos[bloco_adjacente]:
                 veio_de[bloco_adjacente] = bloco_atual

@@ -27,6 +27,8 @@ def desenhar(janela: Surface, grade, linhas, largura):
     for linha in grade:
         for bloco in linha:
             bloco.desenhar(janela)
+            if bloco.tem_esfera():
+                bloco.esfera.desenhar(janela)
     desenhar_grade(janela, linhas, largura)
     pygame.display.update()
 
