@@ -54,19 +54,10 @@ class Bloco(Sprite):
     def is_barreira(self):
         return self.cor_atual == cores.PRETO
 
-    def virar_barreira(self):
-        self.cor_atual = cores.PRETO
-
-    def is_inicio(self):
-        return self.cor_atual == cores.VERMELHO
-
-    def is_final(self):
-        return self.cor_atual == cores.TURQUESA
-
     def reiniciar(self):
         self.cor_atual = self.COR_PADRAO
 
-    def fechar(self):
+    def clarear(self):
         self.cor_atual = cores.clarear(self.COR_PADRAO)
 
     def abrir(self):
@@ -75,7 +66,7 @@ class Bloco(Sprite):
     def iniciar(self):
         self.cor_atual = cores.VERMELHO
 
-    def finalizar(self):
+    def virar_destino(self):
         self.cor_atual = cores.TURQUESA
 
     def virar_caminho(self):
@@ -123,18 +114,39 @@ class Agente(Sprite):
     def criar_agente_no_bloco(bloco):
         agente = Agente(bloco.linha, bloco.coluna, bloco.largura, bloco.total_linhas)
         bloco.agente = agente
+        agente.bloco = bloco
         return agente
 
-    def __init__(self, linha, coluna, largura, total_linhas):
+    def __init__(self, linha, coluna, largura, total_linhas, bloco=None):
         super().__init__(linha, coluna, largura, total_linhas, cores.VERMELHO)
+        self.bloco = bloco
 
     def area_radar(self, grade):
         blocos_no_radar = []
         x, y = self.posicao()
         for i in range(x - 3, x + 4):
             for j in range(y - 3, y + 4):
-                blocos_no_radar.append(grade[i][j])
+                if 0 <= i < 42 and 0 <= j < 42:
+                    blocos_no_radar.append(grade[i][j])
         return blocos_no_radar
+
+    def abrir_radar(self, grade):
+        for bloco in self.area_radar(grade):
+            bloco.clarear()
+
+    def fechar_radar(self, grade):
+        for bloco in self.area_radar(grade):
+            bloco.reiniciar()
+
+    def ir_para_bloco(self, bloco: Bloco):
+        self.bloco.agente = None
+        self.linha = bloco.linha
+        self.coluna = bloco.coluna
+        self.x = bloco.x
+        self.y = bloco.y
+        bloco.agente = self
+        self.bloco = bloco
+
 
 
 class Esfera(Sprite):

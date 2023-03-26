@@ -12,10 +12,13 @@ def heuristica(ponto1, ponto2):
 
 
 def melhor_camiho(trilha, bloco_atual, desenhar):
+    blocos_melhor_caminho = [bloco_atual]
     while bloco_atual in trilha:
         bloco_atual = trilha[bloco_atual]
         bloco_atual.virar_caminho()
         desenhar()
+        blocos_melhor_caminho.append(bloco_atual)
+    return blocos_melhor_caminho
 
 
 def a_estrela(desenhar, grade, bloco_inicial: Bloco, bloco_final: Bloco):
@@ -37,9 +40,9 @@ def a_estrela(desenhar, grade, bloco_inicial: Bloco, bloco_final: Bloco):
         hash_blocos.remove(bloco_atual)
 
         if bloco_atual == bloco_final:
-            melhor_camiho(veio_de, bloco_final, desenhar)
-            bloco_final.finalizar()
-            return True
+            blocos_melhor_caminho = melhor_camiho(veio_de, bloco_final, desenhar)
+            bloco_final.virar_destino()
+            return blocos_melhor_caminho
 
         for bloco_adjacente in bloco_atual.blocos_adjacentes:
             # MODIFY
@@ -60,6 +63,6 @@ def a_estrela(desenhar, grade, bloco_inicial: Bloco, bloco_final: Bloco):
         desenhar()
 
         if bloco_atual != bloco_inicial:
-            bloco_atual.fechar()
+            bloco_atual.clarear()
 
     return False

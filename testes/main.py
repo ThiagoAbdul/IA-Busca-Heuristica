@@ -1,5 +1,4 @@
 import random
-import time
 
 from busca_heuristica.algoritmo import a_estrela, heuristica
 from gui.gui import *
@@ -10,9 +9,9 @@ from model.classes import Bloco, Esfera, Agente
 def definir_pontos_de_busca(grade):
     pontos = []
     x = 3
-    while x <= len(grade):
+    while x <= 42:
         y = 3
-        while y <= len(grade):
+        while y <= 42:
             pontos.append((x, y))
             y += 7
         x += 7
@@ -56,11 +55,6 @@ def criar_grade(linhas, largura):
         grade.append(linha)
     return grade
 
-def limpar_grade(grade):
-    for linha in grade:
-        for bloco in linha:
-            bloco.reiniciar()
-
 
 def main(janela, largura):
     LINHAS = 42
@@ -72,53 +66,49 @@ def main(janela, largura):
     bloco_inicial = bloco_final = None
     em_execucao = True
 
-    blocos_melhor_caminho = None
-
     while em_execucao:
         desenhar(janela, grade, LINHAS, largura)
-        for linha in grade:
-            for bloco in linha:
-                bloco.atualizar_blocos_adjacentes(grade)
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 em_execucao = False
             if clicou_botao_esquerdo_mouse():
                 linha, coluna = get_posicao_click(LINHAS, largura)
                 bloco = grade[linha][coluna]
-                if bloco_inicial is None:
+                if bloco_inicial is None and bloco != bloco_final:
                     bloco_inicial = bloco
                     # bloco.iniciar()
                     agente = Agente.criar_agente_no_bloco(bloco_inicial)
                     agente.abrir_radar(grade)
                     x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(), pontos_de_busca)
-                    bloco_final = grade[x][y]
+                    # bloco_final = grade[x][y]
+                elif bloco_final is None and bloco != bloco_inicial:
+                    bloco_final = bloco
+                    bloco_final.virar_destino()
+                    # TODO
+
+                elif bloco != bloco_final and bloco != bloco_inicial:
+                    pass
+                # TODO
 
             elif clicou_botao_direito_mouse():
                 pass
             # TODO
             if teclou(evento):
                 if teclou_espaco(evento) and bloco_inicial is not None and bloco_final is not None:
-                    limpar_grade(grade)
-                    if blocos_melhor_caminho is None:
-                        blocos_melhor_caminho = a_estrela(
-                            lambda: desenhar(janela, grade, LINHAS, largura),
-                            grade,
-                            bloco_inicial,
-                            bloco_final
-                        )
-                    else:
-                        while len(blocos_melhor_caminho) > 0:
-                            b = blocos_melhor_caminho.pop()
-                            agente.ir_para_bloco(b)
-                            print(b.tem_agente())
-                            limpar_grade(grade)
-                            agente.abrir_radar(grade)
-                            desenhar(janela, grade, LINHAS, largura)
-                            time.sleep(1)
+                    agente.fechar_radar(grade)
+                    for linha in grade:
+                        for bloco in linha:
+                            bloco.atualizar_blocos_adjacentes(grade)
+                    a_estrela(
+                        lambda: desenhar(janela, grade, LINHAS, largura),
+                        grade,
+                        bloco_inicial,
+                        bloco_final
+                    )
                 if teclou_c(evento):
                     bloco_inicial = bloco_final = None
                     grade = criar_grade(LINHAS, largura)
-                    blocos_melhor_caminho = None
+
 
     fechar_janela()
 
