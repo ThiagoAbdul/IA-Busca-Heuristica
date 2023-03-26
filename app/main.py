@@ -56,6 +56,7 @@ def criar_grade(linhas, largura):
         grade.append(linha)
     return grade
 
+
 def limpar_grade(grade):
     for linha in grade:
         for bloco in linha:
@@ -69,61 +70,74 @@ def main(janela, largura):
     pontos_de_busca = definir_pontos_de_busca(grade)
     for i, j in pontos_de_busca:
         grade[i][j].cor_atual = (0, 0, 0)
-    bloco_inicial = bloco_final = None
     em_execucao = True
+    achou_esfera = False
 
-    blocos_melhor_caminho = None
+    bloco_inicial = grade[LINHAS // 2][LINHAS // 2]
+    agente = Agente.criar_agente_no_bloco(bloco_inicial)
+    agente.abrir_radar(grade)
+
+    for linha in grade:
+        for bloco in linha:
+            bloco.atualizar_blocos_adjacentes(grade)
 
     while em_execucao:
         desenhar(janela, grade, LINHAS, largura)
-        for linha in grade:
-            for bloco in linha:
-                bloco.atualizar_blocos_adjacentes(grade)
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 em_execucao = False
-            if clicou_botao_esquerdo_mouse():
-                linha, coluna = get_posicao_click(LINHAS, largura)
-                bloco = grade[linha][coluna]
-                if bloco_inicial is None:
-                    bloco_inicial = bloco
-                    agente = Agente.criar_agente_no_bloco(bloco_inicial)
-                    agente.abrir_radar(grade)
-                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(), pontos_de_busca)
-                    bloco_final = grade[x][y]
-
-            elif clicou_botao_direito_mouse():
-                pass
-            # TODO
-            if teclou(evento):
-                if teclou_espaco(evento) and bloco_inicial is not None and bloco_final is not None:
+            if teclou_espaco(evento):
+                limpar_grade(grade)
+                esferas_localizadas = agente.esferas_localizadas()
+                if len(esferas_localizadas) > 0:
+                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(),
+                                                                       map(Bloco.posicao,
+                                                                           esferas_localizadas))
+                    achou_esfera = True
+                else:
+                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(), pontos_de_busca)
+                bloco_final = grade[x][y]
+                blocos_melhor_caminho = a_estrela(
+                    lambda: desenhar(janela, grade, LINHAS, largura),
+                    grade,
+                    bloco_inicial,
+                    bloco_final
+                )
+                while len(blocos_melhor_caminho) > 0:
+                    b = blocos_melhor_caminho.pop()
+                    agente.ir_para_bloco(b)
                     limpar_grade(grade)
-                    if blocos_melhor_caminho is None:
-                        blocos_melhor_caminho = a_estrela(
-                            lambda: desenhar(janela, grade, LINHAS, largura),
-                            grade,
-                            bloco_inicial,
-                            bloco_final
-                        )
-                    else:
-                        while len(blocos_melhor_caminho) > 0:
-                            b = blocos_melhor_caminho.pop()
-                            agente.ir_para_bloco(b)
-                            limpar_grade(grade)
-                            agente.abrir_radar(grade)
-                            desenhar(janela, grade, LINHAS, largura)
-                            time.sleep(0.2)
-                        pontos_de_busca.remove(ponto_mais_proximo)
-                        for i, j in pontos_de_busca:
-                            grade[i][j].cor_atual = (0, 0, 0)
-                        bloco_inicial = agente.bloco
-                        x, y, = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(), pontos_de_busca)
-                        bloco_final = grade[x][y]
-                        blocos_melhor_caminho = None
-                if teclou_c(evento):
-                    bloco_inicial = bloco_final = None
-                    grade = criar_grade(LINHAS, largura)
-                    blocos_melhor_caminho = None
+                    agente.abrir_radar(grade)
+                    if not achou_esfera:
+                        esferas_localizadas = agente.esferas_localizadas()
+                        if len(esferas_localizadas) > 0:
+                            x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(),
+                                                                               map(Bloco.posicao,
+                                                                                   esferas_localizadas))
+                            bloco_final = grade[x][y]
+                            achou_esfera = True
+                            blocos_melhor_caminho = a_estrela(
+                                lambda: desenhar(janela, grade, LINHAS, largura),
+                                grade,
+                                agente.bloco_atual,
+                                bloco_final
+                            )
+                    desenhar(janela, grade, LINHAS, largura)
+                    time.sleep(0.2)
+                if achou_esfera:
+                    esferas.remove(bloco_final.esfera)
+                    if len(esferas) == 0:
+                        em_execucao = False
+                    bloco_final.esfera = None
+                    achou_esfera = False
+                elif ponto_mais_proximo in pontos_de_busca:
+                    pontos_de_busca.remove(ponto_mais_proximo)
+                for i, j in pontos_de_busca:
+                    grade[i][j].cor_atual = (0, 0, 0)
+                bloco_inicial = agente.bloco_atual
+            if teclou_c(evento):
+                grade = criar_grade(LINHAS, largura)
 
     fechar_janela()
 

@@ -2,6 +2,7 @@ import random
 
 import pygame.draw
 
+from exceptions.exception import NaoTemBlocosNoRadarException
 from model import cores
 
 
@@ -48,12 +49,6 @@ class Bloco(Sprite):
     def tem_agente(self):
         return self.agente is not None
 
-    def is_fechado(self):
-        return self.cor_atual == cores.LARANJA
-
-    def is_barreira(self):
-        return self.cor_atual == cores.PRETO
-
     def reiniciar(self):
         self.cor_atual = self.COR_PADRAO
 
@@ -74,7 +69,7 @@ class Bloco(Sprite):
 
     def atualizar_blocos_adjacentes(self, grade):
         self.blocos_adjacentes = []
-        if self.linha < self.total_linhas - 1:
+        if 0 < self.linha:
             self.blocos_adjacentes.append(grade[self.linha - 1][self.coluna])
 
         if self.linha < self.total_linhas - 1:
@@ -114,21 +109,22 @@ class Agente(Sprite):
     def criar_agente_no_bloco(bloco):
         agente = Agente(bloco.linha, bloco.coluna, bloco.largura, bloco.total_linhas)
         bloco.agente = agente
-        agente.bloco = bloco
+        agente.bloco_atual = bloco
         return agente
 
     def __init__(self, linha, coluna, largura, total_linhas, bloco=None):
         super().__init__(linha, coluna, largura, total_linhas, cores.VERMELHO)
-        self.bloco = bloco
+        self.bloco_atual = bloco
+        self.blocos_no_radar = None
 
     def area_radar(self, grade):
-        blocos_no_radar = []
+        self.blocos_no_radar = []
         x, y = self.posicao()
         for i in range(x - 3, x + 4):
             for j in range(y - 3, y + 4):
                 if 0 <= i < 42 and 0 <= j < 42:
-                    blocos_no_radar.append(grade[i][j])
-        return blocos_no_radar
+                    self.blocos_no_radar.append(grade[i][j])
+        return self.blocos_no_radar
 
     def abrir_radar(self, grade):
         for bloco in self.area_radar(grade):
@@ -139,14 +135,22 @@ class Agente(Sprite):
             bloco.reiniciar()
 
     def ir_para_bloco(self, bloco: Bloco):
-        self.bloco.agente = None
+        self.bloco_atual.agente = None
         self.linha = bloco.linha
         self.coluna = bloco.coluna
         self.x = bloco.x
         self.y = bloco.y
         bloco.agente = self
-        self.bloco = bloco
+        self.bloco_atual = bloco
 
+    def esferas_localizadas(self):
+        esferas = []
+        if self.blocos_no_radar is None:
+            raise NaoTemBlocosNoRadarException
+        for bloco in self.blocos_no_radar:
+            if bloco.tem_esfera():
+                esferas.append(bloco.esfera)
+        return esferas
 
 
 class Esfera(Sprite):

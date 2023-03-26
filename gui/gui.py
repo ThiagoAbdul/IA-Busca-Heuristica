@@ -48,11 +48,15 @@ def teclou(evento: Event):
 
 
 def teclou_c(evento: Event):
-    return evento.key == pygame.K_c
+    if evento.type == pygame.KEYDOWN:
+        return evento.key == pygame.K_c
+    return False
 
 
 def teclou_espaco(evento: Event):
-    return evento.key == pygame.K_SPACE
+    if evento.type == pygame.KEYDOWN:
+        return evento.key == pygame.K_SPACE
+    return False
 
 
 def clicou_fechar_janela():
