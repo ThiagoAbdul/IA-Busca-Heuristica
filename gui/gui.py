@@ -70,3 +70,12 @@ def fechar_janela():
 
 def alterar_titulo(titulo: str):
     pygame.display.set_caption(titulo)
+
+
+def carregar_musica_de_fundo():
+    pygame.init()
+    pygame.mixer.init()
+    musica_fundo = pygame.mixer.Sound('./arquivos/musica.mp3')
+    musica_fundo.set_volume(0.4)
+    musica_fundo.play(-1)
+    return musica_fundo

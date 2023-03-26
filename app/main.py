@@ -82,67 +82,66 @@ def main(janela, largura):
         for bloco in linha:
             bloco.atualizar_blocos_adjacentes(grade)
 
+    carregar_musica_de_fundo()
+
     while em_execucao:
         alterar_titulo(f"Custo total: {agente.custo_percorrido}")
         desenhar(janela, grade, LINHAS, largura)
-
+        time.sleep(1)
+        if not finalizou:
+            limpar_grade(grade)
+            esferas_localizadas = agente.esferas_localizadas()
+            if len(esferas_localizadas) > 0:
+                x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(),
+                                                                   map(Bloco.posicao,
+                                                                       esferas_localizadas))
+                achou_esfera = True
+            else:
+                x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(), pontos_de_busca)
+            bloco_final = grade[x][y]
+            blocos_melhor_caminho = a_estrela(
+                lambda: desenhar(janela, grade, LINHAS, largura),
+                grade,
+                bloco_inicial,
+                bloco_final
+            )
+            while len(blocos_melhor_caminho) > 0:
+                b = blocos_melhor_caminho.pop()
+                agente.ir_para_bloco(b)
+                limpar_grade(grade)
+                agente.abrir_radar(grade)
+                if not achou_esfera:
+                    esferas_localizadas = agente.esferas_localizadas()
+                    if len(esferas_localizadas) > 0:
+                        x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(),
+                                                                           map(Bloco.posicao,
+                                                                               esferas_localizadas))
+                        bloco_final = grade[x][y]
+                        achou_esfera = True
+                        blocos_melhor_caminho = a_estrela(
+                            lambda: desenhar(janela, grade, LINHAS, largura),
+                            grade,
+                            agente.bloco_atual,
+                            bloco_final
+                        )
+                desenhar(janela, grade, LINHAS, largura)
+                time.sleep(0.2)
+            if achou_esfera:
+                esferas.remove(bloco_final.esfera)
+                if len(esferas) == 0:
+                    finalizou = True
+                    alterar_titulo(f"Custo final: {agente.custo_percorrido}")
+                    desenhar(janela, grade, LINHAS, largura)
+                bloco_final.esfera = None
+                achou_esfera = False
+            elif ponto_mais_proximo in pontos_de_busca:
+                pontos_de_busca.remove(ponto_mais_proximo)
+            for i, j in pontos_de_busca:
+                grade[i][j].cor_atual = (0, 0, 0)
+            bloco_inicial = agente.bloco_atual
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 em_execucao = False
-            if teclou_espaco(evento) and not finalizou:
-                limpar_grade(grade)
-                esferas_localizadas = agente.esferas_localizadas()
-                if len(esferas_localizadas) > 0:
-                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(),
-                                                                       map(Bloco.posicao,
-                                                                           esferas_localizadas))
-                    achou_esfera = True
-                else:
-                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(), pontos_de_busca)
-                bloco_final = grade[x][y]
-                blocos_melhor_caminho = a_estrela(
-                    lambda: desenhar(janela, grade, LINHAS, largura),
-                    grade,
-                    bloco_inicial,
-                    bloco_final
-                )
-                while len(blocos_melhor_caminho) > 0:
-                    b = blocos_melhor_caminho.pop()
-                    agente.ir_para_bloco(b)
-                    limpar_grade(grade)
-                    agente.abrir_radar(grade)
-                    if not achou_esfera:
-                        esferas_localizadas = agente.esferas_localizadas()
-                        if len(esferas_localizadas) > 0:
-                            x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(),
-                                                                               map(Bloco.posicao,
-                                                                                   esferas_localizadas))
-                            bloco_final = grade[x][y]
-                            achou_esfera = True
-                            blocos_melhor_caminho = a_estrela(
-                                lambda: desenhar(janela, grade, LINHAS, largura),
-                                grade,
-                                agente.bloco_atual,
-                                bloco_final
-                            )
-                    desenhar(janela, grade, LINHAS, largura)
-                    time.sleep(0.2)
-                if achou_esfera:
-                    esferas.remove(bloco_final.esfera)
-                    if len(esferas) == 0:
-                        finalizou = True
-                        alterar_titulo(f"Custo final: {agente.custo_percorrido}")
-                    bloco_final.esfera = None
-                    achou_esfera = False
-                elif ponto_mais_proximo in pontos_de_busca:
-                    pontos_de_busca.remove(ponto_mais_proximo)
-                for i, j in pontos_de_busca:
-                    grade[i][j].cor_atual = (0, 0, 0)
-                bloco_inicial = agente.bloco_atual
-            if teclou_c(evento):
-                grade = criar_grade(LINHAS, largura)
-                finalizou = False
-
     fechar_janela()
 
 
@@ -152,3 +151,4 @@ JANELA = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
 pygame.display.set_caption("Algoritmo a*")
 
 main(JANELA, LARGURA_TELA)
+
