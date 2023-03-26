@@ -87,7 +87,6 @@ def main(janela, largura):
                 bloco = grade[linha][coluna]
                 if bloco_inicial is None:
                     bloco_inicial = bloco
-                    # bloco.iniciar()
                     agente = Agente.criar_agente_no_bloco(bloco_inicial)
                     agente.abrir_radar(grade)
                     x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(), pontos_de_busca)
@@ -110,11 +109,17 @@ def main(janela, largura):
                         while len(blocos_melhor_caminho) > 0:
                             b = blocos_melhor_caminho.pop()
                             agente.ir_para_bloco(b)
-                            print(b.tem_agente())
                             limpar_grade(grade)
                             agente.abrir_radar(grade)
                             desenhar(janela, grade, LINHAS, largura)
-                            time.sleep(1)
+                            time.sleep(0.2)
+                        pontos_de_busca.remove(ponto_mais_proximo)
+                        for i, j in pontos_de_busca:
+                            grade[i][j].cor_atual = (0, 0, 0)
+                        bloco_inicial = agente.bloco
+                        x, y, = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(), pontos_de_busca)
+                        bloco_final = grade[x][y]
+                        blocos_melhor_caminho = None
                 if teclou_c(evento):
                     bloco_inicial = bloco_final = None
                     grade = criar_grade(LINHAS, largura)
