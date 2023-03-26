@@ -75,7 +75,13 @@ def alterar_titulo(titulo: str):
 def carregar_musica_de_fundo():
     pygame.init()
     pygame.mixer.init()
-    musica_fundo = pygame.mixer.Sound('./arquivos/musica.mp3')
+    musica_fundo = pygame.mixer.Sound('./arquivos/musica.mpeg')
     musica_fundo.set_volume(0.4)
     musica_fundo.play(-1)
     return musica_fundo
+
+
+def emitir_som_de_pegar_esfera():
+    efeito_sonoro = pygame.mixer.Sound('./arquivos/efeito.mpeg')
+    efeito_sonoro.set_volume(0.6)
+    efeito_sonoro.play()

@@ -127,6 +127,7 @@ def main(janela, largura):
                 desenhar(janela, grade, LINHAS, largura)
                 time.sleep(0.2)
             if achou_esfera:
+                emitir_som_de_pegar_esfera()
                 esferas.remove(bloco_final.esfera)
                 if len(esferas) == 0:
                     finalizou = True

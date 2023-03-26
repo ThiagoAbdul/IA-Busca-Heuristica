@@ -161,4 +161,5 @@ class Esfera(Sprite):
         super().__init__(linha, coluna, largura, total_linhas, cores.LARANJA)
 
     def desenhar(self, janela):
-        pygame.draw.ellipse(janela, self.cor_atual, self.coordenada())
+        imagem = pygame.image.load('./arquivos/esfera.png')
+        janela.blit(imagem, self.coordenada())
