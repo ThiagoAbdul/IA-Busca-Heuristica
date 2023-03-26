@@ -8,7 +8,7 @@ from model.classes import Bloco
 def heuristica(ponto1, ponto2):
     x1, y1 = ponto1
     x2, y2 = ponto2
-    return (abs(x1 - x2) + abs(y1 - y2)) * 4
+    return (abs(x1 - x2) + abs(y1 - y2)) * 2
 
 
 def melhor_camiho(trilha, bloco_atual, desenhar):

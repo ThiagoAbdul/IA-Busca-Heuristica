@@ -72,6 +72,7 @@ def main(janela, largura):
         grade[i][j].cor_atual = (0, 0, 0)
     em_execucao = True
     achou_esfera = False
+    finalizou = False
 
     bloco_inicial = grade[LINHAS // 2][LINHAS // 2]
     agente = Agente.criar_agente_no_bloco(bloco_inicial)
@@ -82,12 +83,13 @@ def main(janela, largura):
             bloco.atualizar_blocos_adjacentes(grade)
 
     while em_execucao:
+        alterar_titulo(f"Custo total: {agente.custo_percorrido}")
         desenhar(janela, grade, LINHAS, largura)
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 em_execucao = False
-            if teclou_espaco(evento):
+            if teclou_espaco(evento) and not finalizou:
                 limpar_grade(grade)
                 esferas_localizadas = agente.esferas_localizadas()
                 if len(esferas_localizadas) > 0:
@@ -128,7 +130,8 @@ def main(janela, largura):
                 if achou_esfera:
                     esferas.remove(bloco_final.esfera)
                     if len(esferas) == 0:
-                        em_execucao = False
+                        finalizou = True
+                        alterar_titulo(f"Custo final: {agente.custo_percorrido}")
                     bloco_final.esfera = None
                     achou_esfera = False
                 elif ponto_mais_proximo in pontos_de_busca:
@@ -138,6 +141,7 @@ def main(janela, largura):
                 bloco_inicial = agente.bloco_atual
             if teclou_c(evento):
                 grade = criar_grade(LINHAS, largura)
+                finalizou = False
 
     fechar_janela()
 

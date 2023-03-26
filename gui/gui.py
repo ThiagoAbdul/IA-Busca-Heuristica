@@ -68,3 +68,5 @@ def fechar_janela():
     pygame.quit()
 
 
+def alterar_titulo(titulo: str):
+    pygame.display.set_caption(titulo)

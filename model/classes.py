@@ -116,6 +116,7 @@ class Agente(Sprite):
         super().__init__(linha, coluna, largura, total_linhas, cores.VERMELHO)
         self.bloco_atual = bloco
         self.blocos_no_radar = None
+        self.custo_percorrido = 0
 
     def area_radar(self, grade):
         self.blocos_no_radar = []
@@ -142,6 +143,7 @@ class Agente(Sprite):
         self.y = bloco.y
         bloco.agente = self
         self.bloco_atual = bloco
+        self.custo_percorrido += bloco.custo
 
     def esferas_localizadas(self):
         esferas = []
