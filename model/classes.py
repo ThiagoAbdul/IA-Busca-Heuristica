@@ -18,7 +18,7 @@ class Sprite:
         self.cor_atual = cor
 
     def posicao(self):
-        return self.coluna, self.linha
+        return self.linha, self.coluna
 
     def coordenada(self):
         return self.x, self.y, self.largura, self.largura
@@ -35,14 +35,18 @@ class Bloco(Sprite):
                               BlocoAgua(linha, coluna, largura, total_linhas),
                               BlocoMontanha(linha, coluna, largura, total_linhas)))
 
-    def __init__(self, linha, coluna, largura, total_linhas, cor, custo, esfera=None):
+    def __init__(self, linha, coluna, largura, total_linhas, cor, custo, esfera=None, agente=None):
         super().__init__(linha, coluna, largura, total_linhas, cor)
         self.blocos_adjacentes: list[Bloco] = []
         self.custo = custo
         self.esfera = esfera
+        self.agente = agente
 
     def tem_esfera(self):
         return self.esfera is not None
+
+    def tem_agente(self):
+        return self.agente is not None
 
     def is_fechado(self):
         return self.cor_atual == cores.LARANJA
@@ -111,6 +115,26 @@ class BlocoMontanha(Bloco):
 
     def __init__(self, linha, coluna, largura, total_linhas):
         super().__init__(linha, coluna, largura, total_linhas, cores.MARROM, 60)
+
+
+class Agente(Sprite):
+
+    @staticmethod
+    def criar_agente_no_bloco(bloco):
+        agente = Agente(bloco.linha, bloco.coluna, bloco.largura, bloco.total_linhas)
+        bloco.agente = agente
+        return agente
+
+    def __init__(self, linha, coluna, largura, total_linhas):
+        super().__init__(linha, coluna, largura, total_linhas, cores.VERMELHO)
+
+    def area_radar(self, grade):
+        blocos_no_radar = []
+        x, y = self.posicao()
+        for i in range(x - 3, x + 4):
+            for j in range(y - 3, y + 4):
+                blocos_no_radar.append(grade[i][j])
+        return blocos_no_radar
 
 
 class Esfera(Sprite):

@@ -1,9 +1,31 @@
 import random
 
-from busca_heuristica.algoritmo import a_estrela
+from busca_heuristica.algoritmo import a_estrela, heuristica
 from gui.gui import *
 
-from model.classes import Bloco, Esfera
+from model.classes import Bloco, Esfera, Agente
+
+
+def definir_pontos_de_busca(grade):
+    pontos = []
+    x = 3
+    while x <= 42:
+        y = 3
+        while y <= 42:
+            pontos.append((x, y))
+            y += 7
+        x += 7
+    return pontos
+
+
+def get_ponto_mais_proximo(ponto_atual, pontos):
+    ponto_mais_proximo = None
+    for ponto in pontos:
+        if ponto_mais_proximo is None:
+            ponto_mais_proximo = ponto
+        elif heuristica(ponto_atual, ponto) < heuristica(ponto_atual, ponto_mais_proximo):
+            ponto_mais_proximo = ponto
+    return ponto_mais_proximo
 
 
 def criar_esferas(grade, linhas, largura):
@@ -38,7 +60,9 @@ def main(janela, largura):
     LINHAS = 42
     grade = criar_grade(LINHAS, largura)
     esferas = criar_esferas(grade, LINHAS, largura)
-
+    pontos_de_busca = definir_pontos_de_busca(grade)
+    for i, j in pontos_de_busca:
+        grade[i][j].cor_atual = (0, 0, 0)
     bloco_inicial = bloco_final = None
     em_execucao = True
 
@@ -52,7 +76,12 @@ def main(janela, largura):
                 bloco = grade[linha][coluna]
                 if bloco_inicial is None and bloco != bloco_final:
                     bloco_inicial = bloco
-                    bloco.iniciar()
+                    # bloco.iniciar()
+                    agente = Agente.criar_agente_no_bloco(bloco_inicial)
+                    blocos_radar = agente.area_radar(grade)
+                    for b in blocos_radar:
+                        b.fechar()
+                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(), pontos_de_busca)
                 elif bloco_final is None and bloco != bloco_inicial:
                     bloco_final = bloco
                     bloco_final.finalizar()
