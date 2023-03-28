@@ -146,8 +146,8 @@ def main(janela, largura):
     fechar_janela()
 
 
-LARGURA_TELA = 600
-ALTURA_TELA = 600
+LARGURA_TELA = 630
+ALTURA_TELA = 630
 JANELA = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
 pygame.display.set_caption("Algoritmo a*")
 
