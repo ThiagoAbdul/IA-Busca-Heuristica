@@ -5,15 +5,6 @@ from pygame.event import Event
 from model import cores
 
 
-def get_posicao_click(linhas, largura):
-    posicao = pygame.mouse.get_pos()
-    espaco = largura // linhas
-    x, y = posicao
-    linha = x // espaco
-    coluna = y // espaco
-    return linha, coluna
-
-
 def desenhar_grade(janela, linhas, largura):
     espaco = largura // linhas
     for i in range(linhas):
@@ -37,11 +28,20 @@ def desenhar(janela: Surface, grade, linhas, largura):
 
 def clicou_fechar_janela():
     for evento in pygame.event.get():
-        return evento.type == pygame.QUIT
+        if evento.type == pygame.QUIT:
+            return True
+    return False
 
 
 def fechar_janela():
     pygame.quit()
+
+
+def fechar_janela_ao_clicar():
+    while True:
+        if clicou_fechar_janela():
+            pygame.quit()
+            return
 
 
 def alterar_titulo(titulo: str):

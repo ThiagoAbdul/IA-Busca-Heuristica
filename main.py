@@ -1,6 +1,8 @@
 import random
 import time
 
+from threading import Thread
+
 from busca_heuristica.algoritmo import a_estrela, heuristica
 from gui.gui import *
 
@@ -86,72 +88,74 @@ def main(janela, largura):
     carregar_musica_de_fundo()
 
     ponto_mais_proximo = None
-
-    while em_execucao:
-        alterar_titulo(f"Custo total: {agente.custo_percorrido} \t\tEsferas coletadas: {contador_esferas}")
-        desenhar(janela, grade, LINHAS, largura)
-        time.sleep(0.5)
-        limpar_grade(grade)
-        if finalizou:
-            x, y = CASA_DO_KAMI.posicao()
-        else:
-            esferas_localizadas = agente.esferas_localizadas()
-            if len(esferas_localizadas) > 0:
-                x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(),
-                                                                   map(Bloco.posicao,
-                                                                       esferas_localizadas))
-                achou_esfera = True
-            else:
-                x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(), pontos_de_busca)
-        bloco_final = grade[x][y]
-        blocos_melhor_caminho = a_estrela(
-            lambda: desenhar(janela, grade, LINHAS, largura),
-            grade,
-            bloco_inicial,
-            bloco_final
-        )
-        while len(blocos_melhor_caminho) > 0:
-            b = blocos_melhor_caminho.pop()
-            agente.ir_para_bloco(b)
+    try:
+        while em_execucao:
+            alterar_titulo(f"Custo total: {agente.custo_percorrido} \t\tEsferas coletadas: {contador_esferas}")
+            desenhar(janela, grade, LINHAS, largura)
+            time.sleep(0.5)
             limpar_grade(grade)
-            agente.abrir_radar(grade)
-            if not achou_esfera:
+            if finalizou:
+                x, y = CASA_DO_KAMI.posicao()
+            else:
                 esferas_localizadas = agente.esferas_localizadas()
                 if len(esferas_localizadas) > 0:
-                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(),
+                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(),
                                                                        map(Bloco.posicao,
                                                                            esferas_localizadas))
-                    bloco_final = grade[x][y]
                     achou_esfera = True
-                    blocos_melhor_caminho = a_estrela(
-                        lambda: desenhar(janela, grade, LINHAS, largura),
-                        grade,
-                        agente.bloco_atual,
-                        bloco_final
-                    )
-            desenhar(janela, grade, LINHAS, largura)
-            time.sleep(0.2)
-        if finalizou:
-            alterar_titulo(f"Custo final: {agente.custo_percorrido}")
-            em_execucao = False
-            while not clicou_fechar_janela():
-                pass
-        if achou_esfera:
-            emitir_som_de_pegar_esfera()
-            esferas.remove(bloco_final.esfera)
-            contador_esferas += 1
-            if len(esferas) == 0:
-                finalizou = True
+                else:
+                    x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco_inicial.posicao(), pontos_de_busca)
+            bloco_final = grade[x][y]
+            blocos_melhor_caminho = a_estrela(
+                lambda: desenhar(janela, grade, LINHAS, largura),
+                grade,
+                bloco_inicial,
+                bloco_final
+            )
+            while len(blocos_melhor_caminho) > 0:
+                b = blocos_melhor_caminho.pop()
+                agente.ir_para_bloco(b)
+                limpar_grade(grade)
+                agente.abrir_radar(grade)
+                if not achou_esfera:
+                    esferas_localizadas = agente.esferas_localizadas()
+                    if len(esferas_localizadas) > 0:
+                        x, y = ponto_mais_proximo = get_ponto_mais_proximo(bloco.posicao(),
+                                                                           map(Bloco.posicao,
+                                                                               esferas_localizadas))
+                        bloco_final = grade[x][y]
+                        achou_esfera = True
+                        blocos_melhor_caminho = a_estrela(
+                            lambda: desenhar(janela, grade, LINHAS, largura),
+                            grade,
+                            agente.bloco_atual,
+                            bloco_final
+                        )
                 desenhar(janela, grade, LINHAS, largura)
-            bloco_final.esfera = None
-            achou_esfera = False
-        elif ponto_mais_proximo in pontos_de_busca:
-            pontos_de_busca.remove(ponto_mais_proximo)
-        for i, j in pontos_de_busca:
-            grade[i][j].cor_atual = (0, 0, 0)
-        bloco_inicial = agente.bloco_atual
-        if clicou_fechar_janela():
-            em_execucao = False
+                time.sleep(0.2)
+            if finalizou:
+                alterar_titulo(f"Custo final: {agente.custo_percorrido}")
+                em_execucao = False
+                thread = Thread(target=fechar_janela_ao_clicar)
+                thread.start()
+            if achou_esfera:
+                emitir_som_de_pegar_esfera()
+                esferas.remove(bloco_final.esfera)
+                contador_esferas += 1
+                if len(esferas) == 0:
+                    finalizou = True
+                    desenhar(janela, grade, LINHAS, largura)
+                bloco_final.esfera = None
+                achou_esfera = False
+            elif ponto_mais_proximo in pontos_de_busca:
+                pontos_de_busca.remove(ponto_mais_proximo)
+            for i, j in pontos_de_busca:
+                grade[i][j].cor_atual = (0, 0, 0)
+            bloco_inicial = agente.bloco_atual
+            if clicou_fechar_janela():
+                em_execucao = False
+    except pygame.error:
+        print('Até mais')
 
 
 LARGURA_TELA = 630
