@@ -64,6 +64,7 @@ def limpar_grade(grade):
 
 
 def main(janela, largura):
+    contador_esferas = 0
     LINHAS = 42
     grade = criar_grade(LINHAS, largura)
     esferas = criar_esferas(grade, LINHAS, largura)
@@ -85,7 +86,7 @@ def main(janela, largura):
     carregar_musica_de_fundo()
 
     while em_execucao:
-        alterar_titulo(f"Custo total: {agente.custo_percorrido}")
+        alterar_titulo(f"Custo total: {agente.custo_percorrido}, Esferas coletadas: {contador_esferas}")
         desenhar(janela, grade, LINHAS, largura)
         time.sleep(1)
         if not finalizou:
@@ -129,6 +130,7 @@ def main(janela, largura):
             if achou_esfera:
                 emitir_som_de_pegar_esfera()
                 esferas.remove(bloco_final.esfera)
+                contador_esferas += 1
                 if len(esferas) == 0:
                     finalizou = True
                     alterar_titulo(f"Custo final: {agente.custo_percorrido}")
@@ -146,10 +148,10 @@ def main(janela, largura):
     fechar_janela()
 
 
-LARGURA_TELA = 630
-ALTURA_TELA = 630
+# múltiplos de 42, se quiser 630x630 fica de um bom tamanho tb
+LARGURA_TELA = 840
+ALTURA_TELA = 840
 JANELA = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
-pygame.display.set_caption("Algoritmo a*")
+pygame.display.set_caption("Algoritmo A*")
 
 main(JANELA, LARGURA_TELA)
-

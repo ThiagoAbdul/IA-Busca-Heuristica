@@ -35,30 +35,6 @@ def desenhar(janela: Surface, grade, linhas, largura):
     pygame.display.update()
 
 
-def clicou_botao_esquerdo_mouse():
-    return pygame.mouse.get_pressed()[0]
-
-
-def clicou_botao_direito_mouse():
-    return pygame.mouse.get_pressed()[2]
-
-
-def teclou(evento: Event):
-    return evento.type == pygame.KEYDOWN
-
-
-def teclou_c(evento: Event):
-    if evento.type == pygame.KEYDOWN:
-        return evento.key == pygame.K_c
-    return False
-
-
-def teclou_espaco(evento: Event):
-    if evento.type == pygame.KEYDOWN:
-        return evento.key == pygame.K_SPACE
-    return False
-
-
 def clicou_fechar_janela():
     for evento in pygame.event.get():
         return evento.type == pygame.QUIT
