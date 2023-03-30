@@ -1,7 +1,6 @@
 import random
 import time
 
-from threading import Thread
 
 from busca_heuristica.algoritmo import a_estrela, heuristica
 from gui.gui import *
@@ -136,8 +135,8 @@ def main(janela, largura):
             if finalizou:
                 alterar_titulo(f"Custo final: {agente.custo_percorrido}")
                 em_execucao = False
-                thread = Thread(target=fechar_janela_ao_clicar)
-                thread.start()
+                while not clicou_fechar_janela():
+                    pass
             if achou_esfera:
                 emitir_som_de_pegar_esfera()
                 esferas.remove(bloco_final.esfera)
@@ -154,6 +153,7 @@ def main(janela, largura):
             bloco_inicial = agente.bloco_atual
             if clicou_fechar_janela():
                 em_execucao = False
+        fechar_janela()
     except pygame.error:
         print('Até mais')
 
