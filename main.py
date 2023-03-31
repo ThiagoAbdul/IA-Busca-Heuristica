@@ -5,7 +5,7 @@ import time
 from busca_heuristica.algoritmo import a_estrela, heuristica
 from gui.gui import *
 
-from model.classes import Bloco, Esfera, Agente
+from model.classes import Bloco, Esfera, Agente, BlocoGrama, BlocoAgua, BlocoMontanha
 
 
 def definir_pontos_de_busca(grade):
@@ -45,7 +45,7 @@ def criar_esferas(grade, linhas, largura):
     return esferas
 
 
-def criar_grade(linhas, largura):
+def criar_grade_aleatoriamente(linhas, largura):
     grade = []
     espaco = largura // linhas
 
@@ -58,16 +58,47 @@ def criar_grade(linhas, largura):
     return grade
 
 
+def criar_grade_por_arquivo(linhas, largura):
+    grade = []
+    espaco = largura // linhas
+
+    with open('arquivos/mapa.txt', 'r') as f:
+        data = f.read()
+        rows = data.split('\n')
+        numbers = [[int(x) for x in row.split()] for row in rows]
+
+        #for row in numbers:
+        #    print(' '.join(map(str, row)))
+
+        for i in range(linhas):
+            linha = []
+            for j in range(linhas):
+                if numbers[j][i] == 1:
+                    bloco = BlocoGrama(i, j, espaco, linhas)
+                if numbers[j][i] == 2:
+                    bloco = BlocoAgua(i, j, espaco, linhas)
+                if numbers[j][i] == 3:
+                    bloco = BlocoMontanha(i, j, espaco, linhas)
+                linha.append(bloco)
+            grade.append(linha)
+    return grade
+
+
 def limpar_grade(grade):
     for linha in grade:
         for bloco in linha:
             bloco.reiniciar()
 
 
-def main(janela, largura):
+def main(janela, largura, ler_arquivo=False):
     contador_esferas = 0
     LINHAS = 42
-    grade = criar_grade(LINHAS, largura)
+
+    if ler_arquivo:
+        grade = criar_grade_por_arquivo(LINHAS, largura)
+    else:
+        grade = criar_grade_aleatoriamente(LINHAS, largura)
+
     esferas = criar_esferas(grade, LINHAS, largura)
     pontos_de_busca = definir_pontos_de_busca(grade)
     for i, j in pontos_de_busca:
@@ -163,4 +194,4 @@ ALTURA_TELA = 630
 JANELA = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
 pygame.display.set_caption("Algoritmo A*")
 
-main(JANELA, LARGURA_TELA)
+main(JANELA, LARGURA_TELA, ler_arquivo=True)
