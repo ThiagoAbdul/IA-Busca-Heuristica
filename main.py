@@ -67,9 +67,6 @@ def criar_grade_por_arquivo(linhas, largura):
         rows = data.split('\n')
         numbers = [[int(x) for x in row.split()] for row in rows]
 
-        #for row in numbers:
-        #    print(' '.join(map(str, row)))
-
         for i in range(linhas):
             linha = []
             for j in range(linhas):
@@ -143,8 +140,8 @@ def main(janela, largura, ler_arquivo=False):
                 bloco_final
             )
             while len(blocos_melhor_caminho) > 0:
-                b = blocos_melhor_caminho.pop()
-                agente.ir_para_bloco(b)
+                proximo_bloco = blocos_melhor_caminho.pop()
+                agente.ir_para_bloco(proximo_bloco)
                 limpar_grade(grade)
                 agente.abrir_radar(grade)
                 if not achou_esfera:
@@ -194,4 +191,4 @@ ALTURA_TELA = 630
 JANELA = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
 pygame.display.set_caption("Algoritmo A*")
 
-main(JANELA, LARGURA_TELA, ler_arquivo=True)
+main(JANELA, LARGURA_TELA)
