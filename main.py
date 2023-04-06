@@ -1,10 +1,8 @@
 import random
 import time
 
-
 from busca_heuristica.algoritmo import a_estrela, heuristica
 from gui.gui import *
-
 from model.classes import Bloco, Esfera, Agente, BlocoGrama, BlocoAgua, BlocoMontanha
 
 
@@ -159,7 +157,7 @@ def main(janela, largura, ler_arquivo=False):
                             bloco_final
                         )
                 desenhar(janela, grade, LINHAS, largura)
-                time.sleep(0.2)
+                time.sleep(0.1)
             if finalizou:
                 alterar_titulo(f"Custo final: {agente.custo_percorrido}")
                 em_execucao = False

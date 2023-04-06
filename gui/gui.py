@@ -1,6 +1,5 @@
 import pygame
 from pygame import Surface
-from pygame.event import Event
 
 from model import cores
 

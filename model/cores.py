@@ -10,9 +10,9 @@ CINZA = (127, 127, 127)
 
 
 def clarear(cor):
-    return [tom + 150 if (tom + 150) < 256 else 255 for tom in cor]
+    return [tom + 127 if (tom + 127) < 256 else 255 for tom in cor]
 
 
 def escurecer(cor):
-    return [tom - 200 if (tom - 200) >= 0 else 0 for tom in cor]
+    return [tom - 127 if (tom - 127) >= 0 else 0 for tom in cor]
 

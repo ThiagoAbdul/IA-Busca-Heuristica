@@ -1,7 +1,6 @@
 from queue import PriorityQueue
 
 from gui.gui import clicou_fechar_janela, fechar_janela
-from model import cores
 from model.classes import Bloco
 
 
@@ -11,10 +10,10 @@ def heuristica(ponto1, ponto2):
     return (abs(x1 - x2) + abs(y1 - y2)) * 2
 
 
-def melhor_camiho(trilha, bloco_atual, desenhar):
+def melhor_camiho(blocos_anteriores, bloco_atual, desenhar):
     blocos_melhor_caminho = [bloco_atual]
-    while bloco_atual in trilha:
-        bloco_atual = trilha[bloco_atual]
+    while bloco_atual in blocos_anteriores:
+        bloco_atual = blocos_anteriores[bloco_atual]
         bloco_atual.virar_caminho()
         desenhar()
         blocos_melhor_caminho.append(bloco_atual)
